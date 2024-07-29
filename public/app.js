@@ -139,31 +139,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Fonction pour afficher la liste des articles
-    async function viewArticles() {
-        try {
-            const response = await fetch('/api/articles', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const articles = await response.json();
-            content.innerHTML = `
-                <h2>Liste des articles</h2>
-                <ul>
-                    ${articles.map(article => `
-                        <li>
-                            <h3>${article.nom}</h3>
-                            <p>Code: ${article.codeArticle}</p>
-                            <p>Prix: ${article.prix}€</p>
-                            <p>Quantité: ${article.quantite}</p>
-                            <button onclick="viewArticleDetails('${article._id}')">Voir détails</button>
-                        </li>
-                    `).join('')}
-                </ul>
-            `;
-        } catch (error) {
-            console.error('Erreur lors de la récupération des articles:', error);
-        }
+   // Fonction pour afficher la liste des articles
+async function viewArticles() {
+    try {
+        const response = await fetch('/api/articles', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const articles = await response.json();
+        content.innerHTML = `
+        <h2>Liste des articles</h2>
+        <ul>
+        ${articles.map(article => `
+            <li>
+            <h3>${article.nom}</h3>
+            <p>Code: ${article.codeArticle}</p>
+            <p>Prix: ${article.prix}€</p>
+            <p>Quantité: ${article.quantite}</p>
+            <button onclick="viewArticleDetails('${article._id}', '${token}')">Voir détails</button>
+            </li>
+        `).join('')}
+        </ul>
+        `;
+    } catch (error) {
+        console.error('Erreur lors de la récupération des articles:', error);
     }
+}
 
     // Fonction pour afficher l'état connecté
     function showLoggedInState() {
@@ -201,22 +201,27 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Fonction pour afficher les détails d'un article
-async function viewArticleDetails(id) {
+async function viewArticleDetails(id, token) {
+    console.log('Fonction viewArticleDetails appelée avec id:', id);
     try {
+        console.log('Token utilisé pour la requête:', token);
         const response = await fetch(`/api/articles/${id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
+        console.log('Statut de la réponse:', response.status);
         const article = await response.json();
+        console.log('Article reçu:', article);
         document.getElementById('content').innerHTML = `
             <h2>${article.nom}</h2>
             <p>Code: ${article.codeArticle}</p>
-            <p>Description: ${article.description}</p>
-            <img src="${article.image}" alt="${article.nom}">
+            <p>Description: ${article.description || 'Aucune description disponible'}</p>
+            ${article.image ? `<img src="${article.image}" alt="${article.nom}" style="max-width: 300px;">` : '<p>Aucune image disponible</p>'}
             <p>Prix: ${article.prix}€</p>
             <p>Quantité: ${article.quantite}</p>
             <button onclick="viewArticles()">Retour à la liste</button>
         `;
     } catch (error) {
         console.error('Erreur lors de la récupération des détails de l\'article:', error);
+        document.getElementById('content').innerHTML = '<p>Erreur lors du chargement des détails de l\'article.</p>';
     }
 }
