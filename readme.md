@@ -11,6 +11,7 @@ Ce projet est une application web full-stack développée avec Node.js dans le c
 - Création d'articles
 - Visualisation de la liste des articles (vues liste et grille)
 - Visualisation détaillée d'un article spécifique
+- Recherche d'articles par code ou par scan de code-barres
 - Déconnexion utilisateur
 
 ## Structure du Projet
@@ -59,11 +60,13 @@ Le projet est divisé en deux parties principales :
    - Création d'articles avec titre, description, prix, et quantité
    - Affichage des articles en vue liste ou grille
    - Vue détaillée pour chaque article
+   - Recherche d'articles par code ou scan de code-barres
 
 3. **Interface Utilisateur** :
    - Design responsive
    - Navigation fluide entre les différentes vues
    - Affichage conditionnel des éléments basé sur l'état de connexion
+   - Barre de recherche intégrée pour une recherche rapide des articles
 
 ## Sécurité
 
@@ -71,18 +74,31 @@ Le projet est divisé en deux parties principales :
 - Protection des routes sensibles par authentification JWT
 - Utilisation de variables d'environnement pour les informations sensibles
 
+## Fonctionnalité de Recherche
+
+La nouvelle fonctionnalité de recherche permet aux utilisateurs de trouver rapidement des articles par leur code. Cette fonction supporte deux méthodes de recherche :
+
+1. **Recherche manuelle** : Les utilisateurs peuvent saisir le code de l'article dans la barre de recherche et appuyer sur Entrée pour lancer la recherche.
+2. **Scan de code-barres** : Compatible avec les lecteurs de codes-barres, permettant une recherche instantanée dès que le code est scanné.
+
+Cette fonctionnalité améliore significativement l'efficacité de la gestion des stocks, particulièrement dans un environnement d'entrepôt ou de vente au détail.
+
 ## Défis Techniques Surmontés
 
 - Gestion de l'état global côté client (token d'authentification)
 - Implémentation de vues conditionnelles
 - Mise en place d'une navigation dynamique sans rechargement de page
+- Intégration d'une recherche en temps réel avec support de lecteur de code-barres
+- Gestion des requêtes asynchrones et mise à jour de l'interface utilisateur
 
 ## Perspectives d'Amélioration
 
 - Ajout des fonctionnalités de modification et suppression d'articles
-- Implémentation de la recherche et du filtrage des articles
+- Amélioration du système de recherche avec des filtres avancés
 - Mise en place de tests unitaires et d'intégration
 - Optimisation des performances (mise en cache, pagination)
+- Implémentation d'un système de gestion des stocks en temps réel
+- Ajout de fonctionnalités de reporting et d'analyse des données
 
 ## À Propos
 
