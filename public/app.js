@@ -17,6 +17,18 @@ document.addEventListener('DOMContentLoaded', () => {
     viewArticlesBtn.addEventListener('click', viewArticles);
     logoutBtn.addEventListener('click', logout);
 
+    // Fonction pour afficher la page d'accueil
+function showWelcomePage() {
+    content.innerHTML = `
+        <p class="intro-text">
+            Bienvenue sur notre plateforme de gestion d'articles. Cette
+            application vous permet de gérer efficacement votre inventaire
+            d'articles.
+        </p>
+        <h2>Veuillez vous connecter ou vous inscrire.</h2>
+    `;
+}
+
     // Fonction pour afficher le formulaire d'inscription
     function showRegisterForm() {
         content.innerHTML = `
@@ -140,25 +152,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
    // Fonction pour afficher la liste des articles
-async function viewArticles() {
+async function viewArticles(viewType = 'list') {
     try {
         const response = await fetch('/api/articles', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const articles = await response.json();
+        
+        // Boutons pour changer de vue
+        const viewButtons = `
+            <div class="view-buttons">
+                <button onclick="viewArticles('list')">Vue liste</button>
+                <button onclick="viewArticles('grid')">Vue grille</button>
+            </div>
+        `;
+
+        // Fonction pour générer le HTML d'un article
+        const generateArticleHTML = (article) => `
+            <div class="article-item">
+                <h3>${article.nom}</h3>
+                <p>Code: ${article.codeArticle}</p>
+                <p>Prix: ${article.prix}€</p>
+                <p>Quantité: ${article.quantite}</p>
+                <button onclick="viewArticleDetails('${article._id}', '${token}')">Voir détails</button>
+            </div>
+        `;
+
+        // Génération du HTML en fonction du type de vue
+        const articlesHTML = viewType === 'list'
+            ? `<ul>${articles.map(article => `<li>${generateArticleHTML(article)}</li>`).join('')}</ul>`
+            : `<div class="article-grid">${articles.map(generateArticleHTML).join('')}</div>`;
+
         content.innerHTML = `
-        <h2>Liste des articles</h2>
-        <ul>
-        ${articles.map(article => `
-            <li>
-            <h3>${article.nom}</h3>
-            <p>Code: ${article.codeArticle}</p>
-            <p>Prix: ${article.prix}€</p>
-            <p>Quantité: ${article.quantite}</p>
-            <button onclick="viewArticleDetails('${article._id}', '${token}')">Voir détails</button>
-            </li>
-        `).join('')}
-        </ul>
+            <h2>Liste des articles</h2>
+            ${viewButtons}
+            ${articlesHTML}
         `;
     } catch (error) {
         console.error('Erreur lors de la récupération des articles:', error);
@@ -176,21 +204,22 @@ async function viewArticles() {
     }
 
     // Fonction pour gérer la déconnexion
-    function logout() {
-        localStorage.removeItem('token');
-        token = null;
-        showLoggedOutState();
-    }
+function logout() {
+    localStorage.removeItem('token');
+    token = null;
+    showLoggedOutState();
+    showWelcomePage();
+}
 
-    // Fonction pour afficher l'état déconnecté
-    function showLoggedOutState() {
-        registerBtn.style.display = 'inline';
-        loginBtn.style.display = 'inline';
-        createArticleBtn.style.display = 'none';
-        viewArticlesBtn.style.display = 'none';
-        logoutBtn.style.display = 'none';
-        content.innerHTML = '<h2>Veuillez vous connecter ou vous inscrire.</h2>';
-    }
+   // Fonction pour afficher l'état déconnecté
+function showLoggedOutState() {
+    registerBtn.style.display = 'inline';
+    loginBtn.style.display = 'inline';
+    createArticleBtn.style.display = 'none';
+    viewArticlesBtn.style.display = 'none';
+    logoutBtn.style.display = 'none';
+    showWelcomePage();
+}
 
     // Vérification de l'état de connexion au chargement de la page
     if (token) {
@@ -218,10 +247,13 @@ async function viewArticleDetails(id, token) {
             ${article.image ? `<img src="${article.image}" alt="${article.nom}" style="max-width: 300px;">` : '<p>Aucune image disponible</p>'}
             <p>Prix: ${article.prix}€</p>
             <p>Quantité: ${article.quantite}</p>
-            <button onclick="viewArticles()">Retour à la liste</button>
+            <button onclick="viewArticles('${token}')">Retour à la liste</button>
         `;
     } catch (error) {
         console.error('Erreur lors de la récupération des détails de l\'article:', error);
         document.getElementById('content').innerHTML = '<p>Erreur lors du chargement des détails de l\'article.</p>';
     }
 }
+
+// Afficher la page d'accueil au chargement initial
+showWelcomePage();
