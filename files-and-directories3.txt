@@ -1,0 +1,25 @@
+.
+├── apptotext.js
+├── connect.js
+├── db.js
+├── middleware
+│   └── auth.js
+├── models
+│   ├── Article.js
+│   └── user.js
+├── node_modules
+│   
+├── package-lock.json
+├── package.json
+├── public
+│   ├── app.js
+│   ├── index.html
+│   └── style.css
+├── routes
+│   ├── articles.js
+│   ├── auth.js
+│   └── userData.js
+├── server.js
+├── test_api.sh
+└── user_data.txt
+
