@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Sélection des éléments DOM
     const registerBtn = document.getElementById('registerBtn');
     const loginBtn = document.getElementById('loginBtn');
     const createArticleBtn = document.getElementById('createArticleBtn');
@@ -6,14 +7,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn = document.getElementById('logoutBtn');
     const content = document.getElementById('content');
 
+    // Récupération du token depuis le localStorage
     let token = localStorage.getItem('token');
 
+    // Ajout des écouteurs d'événements
     registerBtn.addEventListener('click', showRegisterForm);
     loginBtn.addEventListener('click', showLoginForm);
     createArticleBtn.addEventListener('click', showCreateArticleForm);
     viewArticlesBtn.addEventListener('click', viewArticles);
     logoutBtn.addEventListener('click', logout);
 
+    // Fonction pour afficher le formulaire d'inscription
     function showRegisterForm() {
         content.innerHTML = `
             <h2>S'inscrire</h2>
@@ -26,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('registerForm').addEventListener('submit', register);
     }
 
+    // Fonction pour afficher le formulaire de connexion
     function showLoginForm() {
         content.innerHTML = `
             <h2>Se connecter</h2>
@@ -38,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('loginForm').addEventListener('submit', login);
     }
 
+    // Fonction pour afficher le formulaire de création d'article
     function showCreateArticleForm() {
         content.innerHTML = `
             <h2>Créer un article</h2>
@@ -54,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('createArticleForm').addEventListener('submit', createArticle);
     }
 
+    // Fonction pour gérer l'inscription
     async function register(e) {
         e.preventDefault();
         const username = document.getElementById('username').value;
@@ -76,6 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Fonction pour gérer la connexion
     async function login(e) {
         e.preventDefault();
         const username = document.getElementById('username').value;
@@ -99,6 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Fonction pour créer un article
     async function createArticle(e) {
         e.preventDefault();
         const articleData = {
@@ -112,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('/api/articles', {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
@@ -130,6 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Fonction pour afficher la liste des articles
     async function viewArticles() {
         try {
             const response = await fetch('/api/articles', {
@@ -155,6 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Fonction pour afficher l'état connecté
     function showLoggedInState() {
         registerBtn.style.display = 'none';
         loginBtn.style.display = 'none';
@@ -164,12 +175,14 @@ document.addEventListener('DOMContentLoaded', () => {
         content.innerHTML = '<h2>Bienvenue! Vous êtes connecté.</h2>';
     }
 
+    // Fonction pour gérer la déconnexion
     function logout() {
         localStorage.removeItem('token');
         token = null;
         showLoggedOutState();
     }
 
+    // Fonction pour afficher l'état déconnecté
     function showLoggedOutState() {
         registerBtn.style.display = 'inline';
         loginBtn.style.display = 'inline';
@@ -179,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
         content.innerHTML = '<h2>Veuillez vous connecter ou vous inscrire.</h2>';
     }
 
-    // Check login state on page load
+    // Vérification de l'état de connexion au chargement de la page
     if (token) {
         showLoggedInState();
     } else {
@@ -187,6 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// Fonction pour afficher les détails d'un article
 async function viewArticleDetails(id) {
     try {
         const response = await fetch(`/api/articles/${id}`, {

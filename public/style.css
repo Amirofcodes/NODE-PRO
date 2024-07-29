@@ -1,3 +1,4 @@
+/* Styles généraux pour le corps de la page */
 body {
     font-family: Arial, sans-serif;
     max-width: 800px;
@@ -5,14 +6,17 @@ body {
     padding: 20px;
 }
 
+/* Styles pour la barre de navigation */
 nav {
     margin-bottom: 20px;
 }
 
+/* Styles pour les boutons */
 button {
     margin-right: 10px;
 }
 
+/* Styles pour les formulaires */
 form {
     display: flex;
     flex-direction: column;
@@ -20,11 +24,13 @@ form {
     max-width: 300px;
 }
 
+/* Styles pour les listes non ordonnées */
 ul {
     list-style-type: none;
     padding: 0;
 }
 
+/* Styles pour les éléments de liste */
 li {
     margin-bottom: 20px;
     border: 1px solid #ddd;
