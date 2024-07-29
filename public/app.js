@@ -1,20 +1,29 @@
-// Variable globale pour stocker le token
+// Variables globales
 let token = localStorage.getItem('token');
+const registerBtn = document.getElementById('registerBtn');
+const loginBtn = document.getElementById('loginBtn');
+const createArticleBtn = document.getElementById('createArticleBtn');
+const viewArticlesBtn = document.getElementById('viewArticlesBtn');
+const searchBtn = document.getElementById('searchBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+const content = document.getElementById('content');
+const searchContainer = document.getElementById('searchContainer');
+const searchInput = document.getElementById('searchInput');
+const submitSearch = document.getElementById('submitSearch');
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Sélection des éléments DOM
-    const registerBtn = document.getElementById('registerBtn');
-    const loginBtn = document.getElementById('loginBtn');
-    const createArticleBtn = document.getElementById('createArticleBtn');
-    const viewArticlesBtn = document.getElementById('viewArticlesBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const content = document.getElementById('content');
-
     // Ajout des écouteurs d'événements
     registerBtn.addEventListener('click', showRegisterForm);
     loginBtn.addEventListener('click', showLoginForm);
     createArticleBtn.addEventListener('click', showCreateArticleForm);
     viewArticlesBtn.addEventListener('click', () => viewArticles());
+    searchBtn.addEventListener('click', toggleSearchBar);
+    submitSearch.addEventListener('click', performSearch);
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
+    });
     logoutBtn.addEventListener('click', logout);
 
     // Vérification de l'état de connexion au chargement de la page
@@ -208,18 +217,10 @@ async function viewArticleDetails(id) {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const article = await response.json();
-        document.getElementById('content').innerHTML = `
-            <h2>${article.nom}</h2>
-            <p>Code: ${article.codeArticle}</p>
-            <p>Description: ${article.description || 'Aucune description disponible'}</p>
-            ${article.image ? `<img src="${article.image}" alt="${article.nom}" style="max-width: 300px;">` : '<p>Aucune image disponible</p>'}
-            <p>Prix: ${article.prix}€</p>
-            <p>Quantité: ${article.quantite}</p>
-            <button onclick="viewArticles()">Retour à la liste</button>
-        `;
+        displayArticleDetails(article);
     } catch (error) {
         console.error('Erreur lors de la récupération des détails de l\'article:', error);
-        document.getElementById('content').innerHTML = '<p>Erreur lors du chargement des détails de l\'article.</p>';
+        content.innerHTML = '<p>Erreur lors du chargement des détails de l\'article.</p>';
     }
 }
 
@@ -229,6 +230,7 @@ function showLoggedInState() {
     loginBtn.style.display = 'none';
     createArticleBtn.style.display = 'inline';
     viewArticlesBtn.style.display = 'inline';
+    searchBtn.style.display = 'inline';
     logoutBtn.style.display = 'inline';
     content.innerHTML = '<h2>Bienvenue! Vous êtes connecté.</h2>';
 }
@@ -238,7 +240,6 @@ function logout() {
     localStorage.removeItem('token');
     token = null;
     showLoggedOutState();
-    showWelcomePage();
 }
 
 // Fonction pour afficher l'état déconnecté
@@ -247,8 +248,56 @@ function showLoggedOutState() {
     loginBtn.style.display = 'inline';
     createArticleBtn.style.display = 'none';
     viewArticlesBtn.style.display = 'none';
+    searchBtn.style.display = 'none';
     logoutBtn.style.display = 'none';
+    searchContainer.style.display = 'none';
     showWelcomePage();
+}
+
+// Fonction pour afficher/masquer la barre de recherche
+function toggleSearchBar() {
+    searchContainer.style.display = searchContainer.style.display === 'none' ? 'flex' : 'none';
+    if (searchContainer.style.display === 'flex') {
+        searchInput.focus();
+    }
+}
+
+// Fonction pour effectuer la recherche
+async function performSearch() {
+    const searchTerm = searchInput.value.trim();
+    if (!searchTerm) {
+        alert('Veuillez entrer un code article');
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/articles/search/${searchTerm}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Article non trouvé');
+        }
+
+        const article = await response.json();
+        displayArticleDetails(article);
+    } catch (error) {
+        console.error('Erreur lors de la recherche:', error);
+        alert(error.message);
+    }
+}
+
+// Fonction pour afficher les détails de l'article
+function displayArticleDetails(article) {
+    content.innerHTML = `
+        <h2>${article.nom}</h2>
+        <p>Code: ${article.codeArticle}</p>
+        <p>Description: ${article.description || 'Aucune description disponible'}</p>
+        ${article.image ? `<img src="${article.image}" alt="${article.nom}" style="max-width: 300px;">` : '<p>Aucune image disponible</p>'}
+        <p>Prix: ${article.prix}€</p>
+        <p>Quantité: ${article.quantite}</p>
+        <button onclick="viewArticles()">Retour à la liste</button>
+    `;
 }
 
 // Afficher la page d'accueil au chargement initial

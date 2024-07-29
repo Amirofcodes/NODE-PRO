@@ -35,4 +35,18 @@ router.get('/:id', auth, async (req, res) => {
   }
 });
 
+// Route pour rechercher un article par son code
+router.get('/search/:codeArticle', auth, async (req, res) => {
+  try {
+      const article = await Article.findOne({ codeArticle: req.params.codeArticle });
+      if (!article) {
+          return res.status(404).json({ message: 'Article non trouvé' });
+      }
+      res.json(article);
+  } catch (error) {
+      console.error('Erreur lors de la recherche de l\'article:', error);
+      res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
 module.exports = router;

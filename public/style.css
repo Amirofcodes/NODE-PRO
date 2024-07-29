@@ -101,3 +101,46 @@ input, textarea {
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
+
+#searchContainer {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+#searchInput {
+    width: 300px;
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+#submitSearch {
+    background: #333;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    border-radius: 5px;
+}
+
+#submitSearch:hover {
+    background: #555;
+}
+
+/* Assurez-vous que le bouton de recherche s'aligne avec les autres boutons */
+#searchBtn {
+    background: #333;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+#searchBtn:hover {
+    background: #555;
+}
