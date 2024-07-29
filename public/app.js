@@ -9,7 +9,6 @@ const logoutBtn = document.getElementById('logoutBtn');
 const content = document.getElementById('content');
 const searchContainer = document.getElementById('searchContainer');
 const searchInput = document.getElementById('searchInput');
-const submitSearch = document.getElementById('submitSearch');
 
 document.addEventListener('DOMContentLoaded', () => {
     // Ajout des écouteurs d'événements
@@ -18,11 +17,16 @@ document.addEventListener('DOMContentLoaded', () => {
     createArticleBtn.addEventListener('click', showCreateArticleForm);
     viewArticlesBtn.addEventListener('click', () => viewArticles());
     searchBtn.addEventListener('click', toggleSearchBar);
-    submitSearch.addEventListener('click', performSearch);
     searchInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
+            e.preventDefault(); // Prevent form submission if within a form
             performSearch();
         }
+        searchInput.addEventListener('input', debounce(function() {
+            if (this.value.length > 0) {
+                performSearch();
+            }
+        }, 300)); // 300ms debounce
     });
     logoutBtn.addEventListener('click', logout);
 
@@ -298,6 +302,15 @@ function displayArticleDetails(article) {
         <p>Quantité: ${article.quantite}</p>
         <button onclick="viewArticles()">Retour à la liste</button>
     `;
+}
+
+//debounce function 
+function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    }
 }
 
 // Afficher la page d'accueil au chargement initial
