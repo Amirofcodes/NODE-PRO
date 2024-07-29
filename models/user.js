@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+// Définition du schéma pour les utilisateurs
 const UserSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -10,6 +11,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  // Tableau pour stocker les données utilisateur (fonctionnalité supplémentaire)
   userData: [{
     name: String,
     age: Number,
@@ -21,4 +23,5 @@ const UserSchema = new mongoose.Schema({
   }
 });
 
+// Exportation du modèle User basé sur le schéma UserSchema
 module.exports = mongoose.model('User', UserSchema);
