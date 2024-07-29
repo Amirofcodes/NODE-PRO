@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+// Définition du schéma pour les articles
 const ArticleSchema = new mongoose.Schema({
   nom: { type: String, required: true },
   codeArticle: { type: String, required: true, unique: true },
@@ -10,4 +11,5 @@ const ArticleSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+// Exportation du modèle Article basé sur le schéma ArticleSchema
 module.exports = mongoose.model('Article', ArticleSchema);
