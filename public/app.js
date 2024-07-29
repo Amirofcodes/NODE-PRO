@@ -1,3 +1,6 @@
+// Variable globale pour stocker le token
+let token = localStorage.getItem('token');
+
 document.addEventListener('DOMContentLoaded', () => {
     // Sélection des éléments DOM
     const registerBtn = document.getElementById('registerBtn');
@@ -7,17 +10,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn = document.getElementById('logoutBtn');
     const content = document.getElementById('content');
 
-    // Récupération du token depuis le localStorage
-    let token = localStorage.getItem('token');
-
     // Ajout des écouteurs d'événements
     registerBtn.addEventListener('click', showRegisterForm);
     loginBtn.addEventListener('click', showLoginForm);
     createArticleBtn.addEventListener('click', showCreateArticleForm);
-    viewArticlesBtn.addEventListener('click', viewArticles);
+    viewArticlesBtn.addEventListener('click', () => viewArticles());
     logoutBtn.addEventListener('click', logout);
 
-    // Fonction pour afficher la page d'accueil
+    // Vérification de l'état de connexion au chargement de la page
+    if (token) {
+        showLoggedInState();
+    } else {
+        showLoggedOutState();
+    }
+});
+
+// Fonction pour afficher la page d'accueil
 function showWelcomePage() {
     content.innerHTML = `
         <p class="intro-text">
@@ -29,129 +37,129 @@ function showWelcomePage() {
     `;
 }
 
-    // Fonction pour afficher le formulaire d'inscription
-    function showRegisterForm() {
-        content.innerHTML = `
-            <h2>S'inscrire</h2>
-            <form id="registerForm">
-                <input type="text" id="username" placeholder="Nom d'utilisateur" required>
-                <input type="password" id="password" placeholder="Mot de passe" required>
-                <button type="submit">S'inscrire</button>
-            </form>
-        `;
-        document.getElementById('registerForm').addEventListener('submit', register);
-    }
+// Fonction pour afficher le formulaire d'inscription
+function showRegisterForm() {
+    content.innerHTML = `
+        <h2>S'inscrire</h2>
+        <form id="registerForm">
+            <input type="text" id="username" placeholder="Nom d'utilisateur" required>
+            <input type="password" id="password" placeholder="Mot de passe" required>
+            <button type="submit">S'inscrire</button>
+        </form>
+    `;
+    document.getElementById('registerForm').addEventListener('submit', register);
+}
 
-    // Fonction pour afficher le formulaire de connexion
-    function showLoginForm() {
-        content.innerHTML = `
-            <h2>Se connecter</h2>
-            <form id="loginForm">
-                <input type="text" id="username" placeholder="Nom d'utilisateur" required>
-                <input type="password" id="password" placeholder="Mot de passe" required>
-                <button type="submit">Se connecter</button>
-            </form>
-        `;
-        document.getElementById('loginForm').addEventListener('submit', login);
-    }
+// Fonction pour afficher le formulaire de connexion
+function showLoginForm() {
+    content.innerHTML = `
+        <h2>Se connecter</h2>
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="Nom d'utilisateur" required>
+            <input type="password" id="password" placeholder="Mot de passe" required>
+            <button type="submit">Se connecter</button>
+        </form>
+    `;
+    document.getElementById('loginForm').addEventListener('submit', login);
+}
 
-    // Fonction pour afficher le formulaire de création d'article
-    function showCreateArticleForm() {
-        content.innerHTML = `
-            <h2>Créer un article</h2>
-            <form id="createArticleForm">
-                <input type="text" id="nom" placeholder="Nom de l'article" required>
-                <input type="text" id="codeArticle" placeholder="Code article" required>
-                <textarea id="description" placeholder="Description"></textarea>
-                <input type="text" id="image" placeholder="URL de l'image">
-                <input type="number" id="prix" placeholder="Prix" required>
-                <input type="number" id="quantite" placeholder="Quantité" required>
-                <button type="submit">Créer</button>
-            </form>
-        `;
-        document.getElementById('createArticleForm').addEventListener('submit', createArticle);
-    }
+// Fonction pour afficher le formulaire de création d'article
+function showCreateArticleForm() {
+    content.innerHTML = `
+        <h2>Créer un article</h2>
+        <form id="createArticleForm">
+            <input type="text" id="nom" placeholder="Nom de l'article" required>
+            <input type="text" id="codeArticle" placeholder="Code article" required>
+            <textarea id="description" placeholder="Description"></textarea>
+            <input type="text" id="image" placeholder="URL de l'image">
+            <input type="number" id="prix" placeholder="Prix" required>
+            <input type="number" id="quantite" placeholder="Quantité" required>
+            <button type="submit">Créer</button>
+        </form>
+    `;
+    document.getElementById('createArticleForm').addEventListener('submit', createArticle);
+}
 
-    // Fonction pour gérer l'inscription
-    async function register(e) {
-        e.preventDefault();
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        try {
-            const response = await fetch('/api/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-            const data = await response.json();
-            if (response.ok) {
-                alert('Inscription réussie. Veuillez vous connecter.');
-                showLoginForm();
-            } else {
-                alert(`Erreur: ${data.message}`);
-            }
-        } catch (error) {
-            console.error('Erreur:', error);
+// Fonction pour gérer l'inscription
+async function register(e) {
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    try {
+        const response = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await response.json();
+        if (response.ok) {
+            alert('Inscription réussie. Veuillez vous connecter.');
+            showLoginForm();
+        } else {
+            alert(`Erreur: ${data.message}`);
         }
+    } catch (error) {
+        console.error('Erreur:', error);
     }
+}
 
-    // Fonction pour gérer la connexion
-    async function login(e) {
-        e.preventDefault();
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        try {
-            const response = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-            const data = await response.json();
-            if (response.ok) {
-                token = data.token;
-                localStorage.setItem('token', token);
-                showLoggedInState();
-            } else {
-                alert(`Erreur: ${data.message}`);
-            }
-        } catch (error) {
-            console.error('Erreur:', error);
+// Fonction pour gérer la connexion
+async function login(e) {
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    try {
+        const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await response.json();
+        if (response.ok) {
+            token = data.token;
+            localStorage.setItem('token', token);
+            showLoggedInState();
+        } else {
+            alert(`Erreur: ${data.message}`);
         }
+    } catch (error) {
+        console.error('Erreur:', error);
     }
+}
 
-    // Fonction pour créer un article
-    async function createArticle(e) {
-        e.preventDefault();
-        const articleData = {
-            nom: document.getElementById('nom').value,
-            codeArticle: document.getElementById('codeArticle').value,
-            description: document.getElementById('description').value,
-            image: document.getElementById('image').value,
-            prix: document.getElementById('prix').value,
-            quantite: document.getElementById('quantite').value
-        };
-        try {
-            const response = await fetch('/api/articles', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(articleData)
-            });
-            const data = await response.json();
-            if (response.ok) {
-                alert('Article créé avec succès');
-                viewArticles();
-            } else {
-                alert(`Erreur: ${data.message}`);
-            }
-        } catch (error) {
-            console.error('Erreur:', error);
+// Fonction pour créer un article
+async function createArticle(e) {
+    e.preventDefault();
+    const articleData = {
+        nom: document.getElementById('nom').value,
+        codeArticle: document.getElementById('codeArticle').value,
+        description: document.getElementById('description').value,
+        image: document.getElementById('image').value,
+        prix: document.getElementById('prix').value,
+        quantite: document.getElementById('quantite').value
+    };
+    try {
+        const response = await fetch('/api/articles', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(articleData)
+        });
+        const data = await response.json();
+        if (response.ok) {
+            alert('Article créé avec succès');
+            viewArticles();
+        } else {
+            alert(`Erreur: ${data.message}`);
         }
+    } catch (error) {
+        console.error('Erreur:', error);
     }
+}
 
-   // Fonction pour afficher la liste des articles
+// Fonction pour afficher la liste des articles
 async function viewArticles(viewType = 'list') {
     try {
         const response = await fetch('/api/articles', {
@@ -174,7 +182,7 @@ async function viewArticles(viewType = 'list') {
                 <p>Code: ${article.codeArticle}</p>
                 <p>Prix: ${article.prix}€</p>
                 <p>Quantité: ${article.quantite}</p>
-                <button onclick="viewArticleDetails('${article._id}', '${token}')">Voir détails</button>
+                <button onclick="viewArticleDetails('${article._id}')">Voir détails</button>
             </div>
         `;
 
@@ -193,53 +201,13 @@ async function viewArticles(viewType = 'list') {
     }
 }
 
-    // Fonction pour afficher l'état connecté
-    function showLoggedInState() {
-        registerBtn.style.display = 'none';
-        loginBtn.style.display = 'none';
-        createArticleBtn.style.display = 'inline';
-        viewArticlesBtn.style.display = 'inline';
-        logoutBtn.style.display = 'inline';
-        content.innerHTML = '<h2>Bienvenue! Vous êtes connecté.</h2>';
-    }
-
-    // Fonction pour gérer la déconnexion
-function logout() {
-    localStorage.removeItem('token');
-    token = null;
-    showLoggedOutState();
-    showWelcomePage();
-}
-
-   // Fonction pour afficher l'état déconnecté
-function showLoggedOutState() {
-    registerBtn.style.display = 'inline';
-    loginBtn.style.display = 'inline';
-    createArticleBtn.style.display = 'none';
-    viewArticlesBtn.style.display = 'none';
-    logoutBtn.style.display = 'none';
-    showWelcomePage();
-}
-
-    // Vérification de l'état de connexion au chargement de la page
-    if (token) {
-        showLoggedInState();
-    } else {
-        showLoggedOutState();
-    }
-});
-
 // Fonction pour afficher les détails d'un article
-async function viewArticleDetails(id, token) {
-    console.log('Fonction viewArticleDetails appelée avec id:', id);
+async function viewArticleDetails(id) {
     try {
-        console.log('Token utilisé pour la requête:', token);
         const response = await fetch(`/api/articles/${id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        console.log('Statut de la réponse:', response.status);
         const article = await response.json();
-        console.log('Article reçu:', article);
         document.getElementById('content').innerHTML = `
             <h2>${article.nom}</h2>
             <p>Code: ${article.codeArticle}</p>
@@ -247,12 +215,40 @@ async function viewArticleDetails(id, token) {
             ${article.image ? `<img src="${article.image}" alt="${article.nom}" style="max-width: 300px;">` : '<p>Aucune image disponible</p>'}
             <p>Prix: ${article.prix}€</p>
             <p>Quantité: ${article.quantite}</p>
-            <button onclick="viewArticles('${token}')">Retour à la liste</button>
+            <button onclick="viewArticles()">Retour à la liste</button>
         `;
     } catch (error) {
         console.error('Erreur lors de la récupération des détails de l\'article:', error);
         document.getElementById('content').innerHTML = '<p>Erreur lors du chargement des détails de l\'article.</p>';
     }
+}
+
+// Fonction pour afficher l'état connecté
+function showLoggedInState() {
+    registerBtn.style.display = 'none';
+    loginBtn.style.display = 'none';
+    createArticleBtn.style.display = 'inline';
+    viewArticlesBtn.style.display = 'inline';
+    logoutBtn.style.display = 'inline';
+    content.innerHTML = '<h2>Bienvenue! Vous êtes connecté.</h2>';
+}
+
+// Fonction pour gérer la déconnexion
+function logout() {
+    localStorage.removeItem('token');
+    token = null;
+    showLoggedOutState();
+    showWelcomePage();
+}
+
+// Fonction pour afficher l'état déconnecté
+function showLoggedOutState() {
+    registerBtn.style.display = 'inline';
+    loginBtn.style.display = 'inline';
+    createArticleBtn.style.display = 'none';
+    viewArticlesBtn.style.display = 'none';
+    logoutBtn.style.display = 'none';
+    showWelcomePage();
 }
 
 // Afficher la page d'accueil au chargement initial
